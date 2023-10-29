@@ -22,6 +22,12 @@ This part is divided in two steps:
 1. **Text Preprocessing**: this initial step involves preprocessing the tweets. This includes the removal of stop words, tokenization, elimination of punctuation marks, stemming, and any other necessary techniques to enhance the data quality. Our goal is to refine the tweets for meaningful analysis, ensuring accuracy and relevance in the subsequent stages of the project. 
 2. **Exploratory Data Analysis**: in this step the goal is to gain insights from the preprocessed dataset. This involved a thorough examination and statistical analysis of the content, such as word counting distribution, average sentence length, vocabulary size, identification of the most retweeted tweets, creation of word clouds to visualize the most frequent words, sentiment analysis and social network analysis. By conducting this comprehensive analysis, we uncovered patterns and information related to the Russo-Ukrainian War tweets.
 
+## Part 2: Indexing and evaluation
+
+This part is also divided in two steps: 
+1. **Indexing**: this step involves the organization and structuring of the dataset in order to ensure efficient information retrieval. This includes creating an inverted index, defining proposed test queries to check our index and ranking the results by implementing TF-IDF mechanism. 
+2. **Evaluation**: in this step the goal is ensure that our implementation provides the user with the most relevant information. We use different evaluation metrics to understand the mechanism's effectiveness such as: Precision@K, Recall@K, Average Precision@K, F1-Score@K, Mean Average Precision, Mean Reciprocal Rank, Normalized Discounted Cumulative Gain.  
+3. **Vector representation**: visualize tweet embeddings
 ## Prerequisites
 
 Before running the Python Notebook, ensure that you have the following prerequisites installed on your system:
@@ -64,7 +70,16 @@ Before running the Python Notebook, ensure that you have the following prerequis
       ```bash
       pip install networkx
       ```
-
+- **New Python Libraries**:
+There are new libraries that will be used for this second part of the project:
+    - **gensim**: Install gensim for document similarity analysis:
+      ```bash
+      pip install gensim
+      ```
+    - **sklearn**: Install sklearn to use TSNE for dimensionality reduction:
+      ```bash
+      pip install sklearn
+      ```
 
 ## How to Use
 ### Running Locally
@@ -108,25 +123,6 @@ To run this project in Google Colab, follow these steps:
 5. **Run the Project**:
 You can run individual code cells by clicking the play button in each cell or run all cells at once using the "Runtime" menu.
    
-   
-## Part 2: Indexing and evaluation
-
-This part is also divided in two steps: 
-1. **Indexing**: this step involves the organization and structuring of the dataset in order to ensure efficient information retrieval. This includes creating an inverted index, defining proposed test queries to check our index and ranking the results by implementing TF-IDF mechanism. 
-2. **Evaluation**: in this step the goal is ensure that our implementation provides the user with the most relevant information. We use different evaluation metrics to understand the mechanism's effectiveness such as: Precision@K, Recall@K, Average Precision@K, F1-Score@K, Mean Average Precision, Mean Reciprocal Rank, Normalized Discounted Cumulative Gain.  
-
-- **New Python Libraries**:
-There are new libraries that will be used for this second part of the project:
-    - **gensim**: Install gensim for document similarity analysis:
-      ```bash
-      pip install gensim
-      ```
-    - **sklearn**: Install sklearn to use TSNE for dimensionality reduction:
-      ```bash
-      pip install sklearn
-      ```
-
-
 
 ## Authors
 
