@@ -109,6 +109,22 @@ To run this project in Google Colab, follow these steps:
 You can run individual code cells by clicking the play button in each cell or run all cells at once using the "Runtime" menu.
    
    
+## Part 2: Indexing and evaluation
+
+This part is also divided in two steps: 
+1. **Indexing**: this step involves the organization and structuring of the dataset in order to ensure efficient information retrieval. This includes creating an inverted index, defining proposed test queries to check our index and ranking the results by implementing TF-IDF mechanism. 
+2. **Evaluation**: in this step the goal is ensure that our implementation provides the user with the most relevant information. We use different evaluation metrics to understand the mechanism's effectiveness such as: Precision@K, Recall@K, Average Precision@K, F1-Score@K, Mean Average Precision, Mean Reciprocal Rank, Normalized Discounted Cumulative Gain.  
+
+- **New Python Libraries**:
+There are new libraries that will be used for this second part of the project:
+    - **gensim**: Install gensim for document similarity analysis:
+      ```bash
+      pip install gensim
+      ```
+    - **sklearn**: Install sklearn to use TSNE for dimensionality reduction:
+      ```bash
+      pip install sklearn
+      ```
 
 
 
