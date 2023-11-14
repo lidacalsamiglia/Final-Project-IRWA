@@ -24,10 +24,19 @@ This part is divided in two steps:
 
 ## Part 2: Indexing and evaluation
 
-This part is also divided in two steps: 
+This part is divided in three steps: 
 1. **Indexing**: this step involves the organization and structuring of the dataset in order to ensure efficient information retrieval. This includes creating an inverted index, defining proposed test queries to check our index and ranking the results by implementing TF-IDF mechanism. 
 2. **Evaluation**: in this step the goal is ensure that our implementation provides the user with the most relevant information. We use different evaluation metrics to understand the mechanism's effectiveness such as: Precision@K, Recall@K, Average Precision@K, F1-Score@K, Mean Average Precision, Mean Reciprocal Rank, Normalized Discounted Cumulative Gain.  
 3. **Vector representation**: visualize tweet embeddings
+
+## Part 3: Ranking
+
+The goal of this part is to find the documents that contain all the terms of the query and to sort them by relevance with regard to the query. This part is divided in three steps:
+
+1. **Our score**: In this step we create our own score involving tweet information about popularity (i.e., favourite count and retweet count). 
+2. **Word2vec**: This score is computed by the cosine similarity between query vectors and document vectors. To create these vectors we average among term embeddings using word2vec pretrained model.
+
+
 ## Prerequisites
 
 Before running the Python Notebook, ensure that you have the following prerequisites installed on your system:
