@@ -2,6 +2,15 @@
 <html lang="en">
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+     <!-- Load jQuery -->
+     <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+
+     <!-- Load Bootstrap CSS -->
+     <link href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/css/bootstrap.min.css" rel="stylesheet">
+ 
+     <!-- Load Bootstrap JS (popper.js and bootstrap.js) -->
+     <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/js/bootstrap.bundle.min.js"></script>
+ 
     {# Using Bootstrap v4.6.1 #}
     <link rel="stylesheet" href="{{ url_for('static', filename='styles/bootstrap.min.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='styles/custom.css') }}">
@@ -38,7 +47,7 @@
         {% block content %}{% endblock %}
     </div>
     <!-- Add space between the title and the search bar -->
-    <div style="margin-bottom: 350px;"></div>
+    <div style="margin-bottom: 300px;"></div>
     <hr>
     <div class='centered'> 24952 - Information Retrieval and Web Analytics</div>
     <div class="text-center mt-3">

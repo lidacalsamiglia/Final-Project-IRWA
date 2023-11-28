@@ -2,7 +2,7 @@
     max-width: 800px;
     padding-top: 10px;
     position: relative;
-    font-family: 'Roboto', sans-serif;
+    font-family: 'Playfair Display', serif;
     color: #404246;
 }
 
@@ -10,26 +10,43 @@
     text-align: center;
 }
 
-.btn-primary,
-.btn-secondary,
-.btn-info { /* Added style for btn-info */
-    background-color: #6e6ad4; /* Blue background color */
-    border-color: #c4c3df; /* Darker blue border color */
-    color: #ffffff; /* White text color */
-    width: auto; /* Let the width adjust to content */
-    white-space: nowrap; /* Prevent text from wrapping */
+/* Updated styling for the dropdown */
+select[name="search-algorithm"] {
+    background-color: #d8d6d6; 
+    border-color: #ddddde; 
+    color: #5d5b5b;
+    width: auto;
+    white-space: nowrap;
+    height: 42px; /* Adjust the height to match other elements */
+    font-size: 0.95em;
+    padding-left: 10px; /* Adjust the left padding to match other elements */
 }
 
-.btn-primary:hover,
-.btn-secondary:hover,
-.btn-info:hover { /* Added style for btn-info on hover */
-    background-color: #8481d5; /* Darker blue on hover */
-    border-color: #5450c6; /* Darker border on hover */
+/* Updated styling for the dropdown on hover */
+select[name="search-algorithm"]:hover {
+    background-color: #b3b2b2; 
+    border-color: #cfcfcf; 
 }
+
+/* Updated styling for the dropdown arrow */
+select[name="search-algorithm"]::-ms-expand {
+    display: none; /* Remove default arrow in IE */
+}
+
+/* Updated styling for the dropdown arrow in other browsers */
+select[name="search-algorithm"]::after {
+    content: '\25BC'; /* Unicode character for down arrow */
+    position: absolute;
+    top: 50%;
+    right: 10px; /* Adjust the right distance to match other elements */
+    transform: translateY(-50%);
+}
+
+/* Rest of your existing styles remain unchanged */
 
 .header {
     font-size: 1.7em;
-    margin: 0; /* Reset margin */
+    margin: 0;
     font-weight: bold;
 }
 

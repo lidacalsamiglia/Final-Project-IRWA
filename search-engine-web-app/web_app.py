@@ -11,8 +11,9 @@ from myapp.analytics.analytics_data import AnalyticsData, ClickedDoc
 from myapp.search.load_corpus import load_corpus
 from myapp.search.load_corpus import _load_corpus_as_dataframe
 
-from myapp.search.objects import Document, StatsDocument
+from myapp.search.objects import Document, StatsDocument, ResultItem
 from myapp.search.search_engine import SearchEngine
+import json
 
 
 # *** for using method to_json in objects ***
@@ -25,8 +26,16 @@ JSONEncoder.default = _default
 
 # end lines ***for using method to_json in objects ***
 
-# instantiate the Flask application
+
+class CustomJSONEncoder(json.JSONEncoder):
+    def default(self, obj):
+        if isinstance(obj, ResultItem):
+            # Convert ResultItem to a dictionary for serialization
+            return obj.to_dict()
+        return super().default(obj)
+
 app = Flask(__name__)
+app.json_encoder = CustomJSONEncoder
 
 # random 'secret_key' is used for persisting data in secure cookie
 app.secret_key = 'afgsreg86sr897b6st8b76va8er76fcs6g8d7'
@@ -46,7 +55,7 @@ path, filename = os.path.split(full_path)
 print(path + ' --> ' + filename + "\n")
 # load documents corpus into memory.
 file_path1 = path + "/Rus_Ukr_war_data.json"
-file_path2 = path + "/Rus_Ukr_war_data_ids.csv" # TODO: no cal el merge
+file_path2 = path + "/Rus_Ukr_war_data_ids.csv"
 
 # file_path = "../../tweets-data-who.json"
 corpus = load_corpus(file_path1, file_path2)
@@ -76,6 +85,22 @@ def index():
 
     return render_template('index.html', page_title="Welcome")
 
+'''@app.route('/search', methods=['POST'])
+def search_form_post():
+    search_query = request.form['search-query']
+
+    session['last_search_query'] = search_query
+
+    search_id = analytics_data.save_query_terms(search_query)
+
+    results = search_engine.search(search_query, search_id, corpus)
+
+    found_count = len(results)
+    session['last_found_count'] = found_count
+
+    print(session)
+
+    return render_template('results.html', results_list=results, page_title="Results", found_counter=found_count)'''
 
 @app.route('/search', methods=['POST'])
 def search_form_post():
@@ -102,11 +127,12 @@ def search_form_post():
 
     found_count = len(results)
     session['last_found_count'] = found_count
-
+    serializable_results = [result.to_dict() for result in results]
+    session['results'] = serializable_results
+   
     print(session)
 
     return render_template('results.html', results_list=results, page_title="Results", search_algorithm=search_algorithm, found_counter=found_count)
-
 
 @app.route('/doc_details', methods=['GET'])
 def doc_details():
@@ -136,27 +162,31 @@ def doc_details():
 
     return render_template('doc_details.html')
 
-
 @app.route('/stats', methods=['GET'])
 def stats():
-    """
-    Show simple statistics example. ### Replace with dashboard ###
-    :return:
-    """
-
     docs = []
-    # ### Start replace with your code ###
 
     for doc_id in analytics_data.fact_clicks:
         row: Document = corpus[int(doc_id)]
         count = analytics_data.fact_clicks[doc_id]
-        doc = StatsDocument(row.id, row.title, row.description, row.doc_date, row.url, count)
+
+        serializable_results = session.get('results', [])
+        results = [ResultItem.from_dict(result) for result in serializable_results]
+
+        result_item = next((item for item in results if item.id == doc_id), None)
+
+        if result_item:
+            ranking = result_item.ranking
+        else:
+            ranking = None
+
+        doc = StatsDocument(row.id, row.title, row.description, row.doc_date, row.url, count, ranking)
         docs.append(doc)
 
-    # simulate sort by ranking
-    docs.sort(key=lambda doc: doc.count, reverse=True)
+    docs.sort(key=lambda doc: (doc.count, doc.ranking), reverse=True)
+
     return render_template('stats.html', clicks_data=docs)
-    # ### End replace with your code ###
+
 
 
 @app.route('/dashboard', methods=['GET'])

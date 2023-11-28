@@ -312,7 +312,7 @@ def word2vec_search(query, index, model, corpus):
     return ranked_docs, doc_scores
 
 
-def search_in_corpus(corpus, query, alg, corpus_df):
+'''def search_in_corpus(corpus, query, alg, corpus_df, search_id):
     inv_index, tf, df, idf = create_index_tfidf(corpus, len(corpus))
     if alg==1:
         ranked_docs, doc_scores = search_tf_idf(query, inv_index, idf, tf)
@@ -326,7 +326,32 @@ def search_in_corpus(corpus, query, alg, corpus_df):
     for index in ranked_docs:
         if 0 <= index < len(corpus):
             item: Document = ll[index]
-            results.append(ResultItem(item.id, item.title, item.description, item.doc_date, item.url, item.likes, item.retweets))
+            results.append(ResultItem(item.id, item.title, item.description, item.doc_date, item.url, 
+                                      "doc_details?id={}&search_id={}&param2=2".format(item.id, search_id), 
+                                      item.likes, item.retweets))
+
+    return results'''
+def search_in_corpus(corpus, query, alg, corpus_df, search_id):
+    inv_index, tf, df, idf = create_index_tfidf(corpus, len(corpus))
+    if alg == 1:
+        ranked_docs, doc_scores = search_tf_idf(query, inv_index, idf, tf)
+    elif alg == 2:
+        ranked_docs, doc_scores = our_search(query, inv_index, idf, tf, corpus)
+    else:
+        model = Word2Vec(corpus_df['Preprocessed_tweet'], vector_size=100, min_count=20, window=5)
+        ranked_docs, doc_scores = word2vec_search(query, inv_index, model, corpus)
+
+    results = []
+    ll = list(corpus.values())
+    for rank, index in enumerate(ranked_docs):
+        if 0 <= index < len(corpus):
+            item: Document = ll[index]
+            result_item = ResultItem(
+                item.id, item.title, item.description, item.doc_date, item.url,
+                "doc_details?id={}&search_id={}&param2=2".format(item.id, search_id),
+                item.likes, item.retweets, rank + 1  # Adding 1 to make it 1-based index
+            )
+            results.append(result_item)
 
     return results
 
