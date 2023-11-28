@@ -2,7 +2,7 @@
     max-width: 800px;
     padding-top: 10px;
     position: relative;
-    font-family: 'Helvetica Neue', sans-serif;
+    font-family: 'Roboto', sans-serif;
     color: #404246;
 }
 
@@ -10,26 +10,26 @@
     text-align: center;
 }
 
-/*.btn-primary {*/
-/*    background-color: #c8102e;*/
-/*    border: #c8102e;*/
-/*}*/
-
 .btn-primary,
-.btn-primary:active,
-.btn-primary:focus,
-.btn-primary:hover,
-.btn-primary:not(:disabled):not(.disabled):active {
-    /*color: #ffffff;*/
-    background-color: #c8102e;
-    border-color: #c8102e;
+.btn-secondary,
+.btn-info { /* Added style for btn-info */
+    background-color: #6e6ad4; /* Blue background color */
+    border-color: #c4c3df; /* Darker blue border color */
+    color: #ffffff; /* White text color */
+    width: auto; /* Let the width adjust to content */
+    white-space: nowrap; /* Prevent text from wrapping */
 }
 
+.btn-primary:hover,
+.btn-secondary:hover,
+.btn-info:hover { /* Added style for btn-info on hover */
+    background-color: #8481d5; /* Darker blue on hover */
+    border-color: #5450c6; /* Darker border on hover */
+}
 
 .header {
     font-size: 1.7em;
-    margin-inline-start: 0px;
-    margin-inline-end: 0px;
+    margin: 0; /* Reset margin */
     font-weight: bold;
 }
 
@@ -37,7 +37,6 @@ input[type=submit] {
     background-color: #c8102e;
     border: none;
     color: white;
-    padding: 15px 32px;
     text-align: center;
     text-decoration: none;
     display: inline-block;
@@ -50,13 +49,13 @@ input[type=submit]:hover {
 
 .search-text {
     border: 1px solid #5f6368;
-    box-shadow: none;
+    box-shadow: 1px; /* This might need more context; consider removing if unnecessary */
     z-index: 3;
     height: 42px;
     margin: 0 auto;
     width: auto;
     min-width: 300px;
-    max-width: 584px;
+    max-width: 600px;
     font-size: 0.95em;
-    adding-left: 5px;
+    padding-left: 20px;
 }

@@ -2,17 +2,41 @@
 {% block page_title %}{{ page_title }}{% endblock %}
 {% block content %}
     <div class="centered">
-        <p>&nbsp;</p>
-        <p>&nbsp;</p>
-        <p>&nbsp;</p>
-        <form class="d-flex" method="POST" onSubmit='return validate();' action="/search">
-            <input class="form-control me-2" name="search-query" type="search" placeholder="Search" aria-label="Search"
-                   autofocus="autofocus">
-            <button class="btn btn-primary" type="submit" onclick='this.form.submit();'>Search</button>
+        <form class="text-center" method="POST" onSubmit='return validate();' action="/search">
+            <input class="form-control mb-2" name="search-query" type="search" placeholder="Search" aria-label="Search" autofocus="autofocus">
+            <div class="row">
+                <div class="col">
+                    <button class="btn btn-primary" type="submit" name="search-algorithm" value="algorithm_1" onclick="showMessage('You selected the search algorithm based on a tf-idf score + cosine similarity.');">Search Algorithm I</button>
+                </div>
+                <div class="col">
+                    <button class="btn btn-secondary" type="submit" name="search-algorithm" value="algorithm_2" onclick="showMessage('You selected the search algorithm which is an expansion of the algorithm I, integrating popularity metrics.');">Search Algorithm II</button>
+                </div>
+                <div class="col">
+                    <button class="btn btn-info" type="submit" name="search-algorithm" value="algorithm_3" onclick="showMessage('You selected the search algorithm based on word2vec + cosine similarity');">Search Algorithm III</button>
+                </div>
+            </div>
             <input name="upf-irwa-hidden" type="hidden" value="123">
         </form>
-        <p>&nbsp;</p>
-        <p>&nbsp;</p>
-        <p>&nbsp;</p>
+        <div id="message-container"></div>
+        <div id="loading-indicator" style="display: none;">
+            <!-- Add loading indicator-->
+            Loading...
+        </div>
     </div>
+
+    <script>
+        function showMessage(message) {
+            document.getElementById('message-container').innerHTML = '<div class="alert alert-info">' + message + '</div>';
+            
+            // Show loading indicator
+            document.getElementById('loading-indicator').style.display = 'block';
+        
+            setTimeout(function () {
+                // Hide loading indicator after a delay (simulating search completion)
+                document.getElementById('loading-indicator').style.display = 'none';
+                // Clear the message when results are shown
+                document.getElementById('message-container').innerHTML = '';
+            }, 10000000000000);  // Adjust this timeout to match your actual search time
+        }
+    </script>
 {% endblock %}

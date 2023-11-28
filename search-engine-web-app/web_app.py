@@ -3,12 +3,14 @@ from json import JSONEncoder
 
 # pip install httpagentparser
 import httpagentparser  # for getting the user agent as json
-import nltk
+#import nltk
 from flask import Flask, render_template, session
 from flask import request
 
 from myapp.analytics.analytics_data import AnalyticsData, ClickedDoc
 from myapp.search.load_corpus import load_corpus
+from myapp.search.load_corpus import _load_corpus_as_dataframe
+
 from myapp.search.objects import Document, StatsDocument
 from myapp.search.search_engine import SearchEngine
 
@@ -41,13 +43,16 @@ analytics_data = AnalyticsData()
 # print("__file__", __file__ + "\n")
 full_path = os.path.realpath(__file__)
 path, filename = os.path.split(full_path)
-# print(path + ' --> ' + filename + "\n")
+print(path + ' --> ' + filename + "\n")
 # load documents corpus into memory.
-file_path = path + "/Rus_Ukr_war_data.json"
+file_path1 = path + "/Rus_Ukr_war_data.json"
+file_path2 = path + "/Rus_Ukr_war_data_ids.csv" # TODO: no cal el merge
 
 # file_path = "../../tweets-data-who.json"
-corpus = load_corpus(file_path)
+corpus = load_corpus(file_path1, file_path2)
 print("loaded corpus. first elem:", list(corpus.values())[0])
+corpus_df = _load_corpus_as_dataframe(file_path1,file_path2)
+#print("loaded corpus. first elem: ", corpus.head(1) )
 
 
 # Home URL "/"
@@ -57,7 +62,7 @@ def index():
 
     # flask server creates a session by persisting a cookie in the user's browser.
     # the 'session' object keeps data between multiple requests
-    session['some_var'] = "IRWA 2021 home"
+    session['some_var'] = "IRWA 2023 home"
 
     user_agent = request.headers.get('User-Agent')
     print("Raw user browser:", user_agent)
@@ -75,19 +80,32 @@ def index():
 @app.route('/search', methods=['POST'])
 def search_form_post():
     search_query = request.form['search-query']
+    search_algorithm = request.form.get('search-algorithm', 'algorithm_1')
 
     session['last_search_query'] = search_query
 
     search_id = analytics_data.save_query_terms(search_query)
+    print("SEARCH ID: ", search_id)
 
-    results = search_engine.search(search_query, search_id, corpus)
+    if search_algorithm == 'algorithm_1':
+        # Call the search function for Algorithm I
+        results = search_engine.search(search_query, search_id, corpus, 1, corpus_df)
+    elif search_algorithm == 'algorithm_2':
+        # Call the search function for Algorithm II 
+        results = search_engine.search(search_query, search_id, corpus, 2, corpus_df)
+    elif search_algorithm == 'algorithm_3':
+        # Call the search function for Algorithm II 
+        results = search_engine.search(search_query, search_id, corpus, 3, corpus_df)
+    else:
+        # Handle unknown search algorithms
+        return render_template('error.html', error_message="Unknown search algorithm")
 
     found_count = len(results)
     session['last_found_count'] = found_count
 
     print(session)
 
-    return render_template('results.html', results_list=results, page_title="Results", found_counter=found_count)
+    return render_template('results.html', results_list=results, page_title="Results", search_algorithm=search_algorithm, found_counter=found_count)
 
 
 @app.route('/doc_details', methods=['GET'])
