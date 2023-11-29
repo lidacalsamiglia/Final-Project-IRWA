@@ -15,6 +15,11 @@ from myapp.search.objects import Document, StatsDocument, ResultItem
 from myapp.search.search_engine import SearchEngine
 import json
 
+from flask_sqlalchemy import SQLAlchemy
+
+from myapp.analytics.data_storage import Session, Click, Request
+
+
 
 # *** for using method to_json in objects ***
 def _default(self, obj):
@@ -36,6 +41,8 @@ class CustomJSONEncoder(json.JSONEncoder):
 
 app = Flask(__name__)
 app.json_encoder = CustomJSONEncoder
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///site.db'
+db = SQLAlchemy(app)
 
 # random 'secret_key' is used for persisting data in secure cookie
 app.secret_key = 'afgsreg86sr897b6st8b76va8er76fcs6g8d7'
@@ -64,8 +71,26 @@ corpus_df = _load_corpus_as_dataframe(file_path1,file_path2)
 #print("loaded corpus. first elem: ", corpus.head(1) )
 
 
+# Sign In route
+@app.route('/', methods=['GET', 'POST'])
+def sign_in():
+    if request.method == 'POST':
+        # Get form data
+        username = request.form['username']
+        password = request.form['password']
+
+        # Validate the username and password (implement your authentication logic)
+
+        # For this example, let's assume a simple check
+        new_session = Session(username=username, start_time=datetime.utcnow())
+        db.session.add(new_session)
+        db.session.commit()
+
+        
+    return render_template('signin.html')
+
 # Home URL "/"
-@app.route('/')
+@app.route('/index', methods=['POST'])
 def index():
     print("starting home url /...")
 
