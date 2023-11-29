@@ -1,6 +1,16 @@
 import json
 import random
+'''import geoip2.database
 
+def get_country(ip_address):
+    reader = geoip2.database.Reader('GeoLite2-Country.mmdb')
+    response = reader.country(ip_address)
+    return response.country.name
+
+def get_city(ip_address):
+    reader = geoip2.database.Reader('GeoLite2-City.mmdb')
+    response = reader.city(ip_address)
+    return response.city.name'''
 
 class AnalyticsData:
     """
@@ -20,6 +30,9 @@ class AnalyticsData:
     def save_query_terms(self, terms: str) -> int:
         print(self)
         return random.randint(0, 100000)
+    
+    def count_query_terms(self, terms: int) -> int:
+        return (len(terms.split()))
 
 
 class ClickedDoc:
@@ -36,3 +49,4 @@ class ClickedDoc:
         Print the object content as a JSON string
         """
         return json.dumps(self)
+

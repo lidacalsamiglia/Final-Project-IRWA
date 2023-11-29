@@ -14,10 +14,11 @@ from myapp.search.load_corpus import _load_corpus_as_dataframe
 from myapp.search.objects import Document, StatsDocument, ResultItem
 from myapp.search.search_engine import SearchEngine
 import json
+import random
+from datetime import datetime
 
-from flask_sqlalchemy import SQLAlchemy
 
-from myapp.analytics.data_storage import Session, Click, Request
+
 
 
 
@@ -41,8 +42,7 @@ class CustomJSONEncoder(json.JSONEncoder):
 
 app = Flask(__name__)
 app.json_encoder = CustomJSONEncoder
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///site.db'
-db = SQLAlchemy(app)
+
 
 # random 'secret_key' is used for persisting data in secure cookie
 app.secret_key = 'afgsreg86sr897b6st8b76va8er76fcs6g8d7'
@@ -66,7 +66,6 @@ file_path2 = path + "/Rus_Ukr_war_data_ids.csv"
 
 # file_path = "../../tweets-data-who.json"
 corpus = load_corpus(file_path1, file_path2)
-print("loaded corpus. first elem:", list(corpus.values())[0])
 corpus_df = _load_corpus_as_dataframe(file_path1,file_path2)
 #print("loaded corpus. first elem: ", corpus.head(1) )
 
@@ -74,58 +73,29 @@ corpus_df = _load_corpus_as_dataframe(file_path1,file_path2)
 # Sign In route
 @app.route('/', methods=['GET', 'POST'])
 def sign_in():
-    if request.method == 'POST':
-        # Get form data
-        username = request.form['username']
-        password = request.form['password']
-
-        # Validate the username and password (implement your authentication logic)
-
-        # For this example, let's assume a simple check
-        new_session = Session(username=username, start_time=datetime.utcnow())
-        db.session.add(new_session)
-        db.session.commit()
-
-        
-    return render_template('signin.html')
+    return render_template('signin.html', page_title="Sign In")
 
 # Home URL "/"
 @app.route('/index', methods=['POST'])
 def index():
     print("starting home url /...")
-
-    # flask server creates a session by persisting a cookie in the user's browser.
-    # the 'session' object keeps data between multiple requests
-    session['some_var'] = "IRWA 2023 home"
-
-    user_agent = request.headers.get('User-Agent')
-    print("Raw user browser:", user_agent)
-
-    user_ip = request.remote_addr
-    agent = httpagentparser.detect(user_agent)
-
-    print("Remote IP: {} - JSON user browser {}".format(user_ip, agent))
-
+    # flask server stores the data in the session object
+    session['id'] = random.randint(0, 100000)
+    # store the username in the session object
+    session['username'] = request.form['username']
+    session['device'] = httpagentparser.detect(request.headers.get('User-Agent'))['platform']['name']
+    session['browser'] = httpagentparser.detect(request.headers.get('User-Agent'))['browser']['name']
+    session['user_ip'] = request.remote_addr
+    session['country'] = request.form['country']
+    session['city'] = request.form['city']
+    session['query_counter'] = 0
+    session['start_time'] = datetime.utcnow()
+    
     print(session)
 
     return render_template('index.html', page_title="Welcome")
 
-'''@app.route('/search', methods=['POST'])
-def search_form_post():
-    search_query = request.form['search-query']
 
-    session['last_search_query'] = search_query
-
-    search_id = analytics_data.save_query_terms(search_query)
-
-    results = search_engine.search(search_query, search_id, corpus)
-
-    found_count = len(results)
-    session['last_found_count'] = found_count
-
-    print(session)
-
-    return render_template('results.html', results_list=results, page_title="Results", found_counter=found_count)'''
 
 @app.route('/search', methods=['POST'])
 def search_form_post():
@@ -135,7 +105,9 @@ def search_form_post():
     session['last_search_query'] = search_query
 
     search_id = analytics_data.save_query_terms(search_query)
+    count_query_terms = analytics_data.count_query_terms(search_query)
     print("SEARCH ID: ", search_id)
+    print("NUMBER OF QUERY TERMS: ", count_query_terms)
 
     if search_algorithm == 'algorithm_1':
         # Call the search function for Algorithm I
