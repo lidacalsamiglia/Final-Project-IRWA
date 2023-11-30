@@ -1,16 +1,6 @@
 import json
 import random
-'''import geoip2.database
 
-def get_country(ip_address):
-    reader = geoip2.database.Reader('GeoLite2-Country.mmdb')
-    response = reader.country(ip_address)
-    return response.country.name
-
-def get_city(ip_address):
-    reader = geoip2.database.Reader('GeoLite2-City.mmdb')
-    response = reader.city(ip_address)
-    return response.city.name'''
 
 class AnalyticsData:
     """
@@ -22,7 +12,9 @@ class AnalyticsData:
     fact_clicks = dict([])
 
     # statistics table 2
-    fact_two = dict([])
+    # fact_time is a dictionary with the second counter: key = doc id | value = time spent in seconds
+
+    fact_time = dict([])
 
     # statistics table 3
     fact_three = dict([])
@@ -33,7 +25,19 @@ class AnalyticsData:
     
     def count_query_terms(self, terms: int) -> int:
         return (len(terms.split()))
+    
+    def save_click(self, doc_id: int) -> None:
+        if doc_id in self.fact_clicks.keys():
+            self.fact_clicks[doc_id] += 1
+        else:
+            self.fact_clicks[doc_id] = 1
 
+    def save_time(self, doc_id: int, time: int) -> None:
+        if doc_id in self.fact_time.keys():
+            self.fact_time[doc_id] += time
+        else:
+            self.fact_time[doc_id] = time
+    
 
 class ClickedDoc:
     def __init__(self, doc_id, description, counter):
@@ -49,4 +53,9 @@ class ClickedDoc:
         Print the object content as a JSON string
         """
         return json.dumps(self)
+    
+    def update_counter(self):
+        self.counter += 1
+        return self.counter
+    
 

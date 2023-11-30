@@ -11,16 +11,15 @@ from myapp.analytics.analytics_data import AnalyticsData, ClickedDoc
 from myapp.search.load_corpus import load_corpus
 from myapp.search.load_corpus import _load_corpus_as_dataframe
 
-from myapp.search.objects import Document, StatsDocument, ResultItem
+from myapp.search.objects import Document, StatsDocument, ResultItem, Query, Visitor
 from myapp.search.search_engine import SearchEngine
 import json
 import random
 from datetime import datetime
 
 
-
-
-
+visitors = []
+queries = []
 
 # *** for using method to_json in objects ***
 def _default(self, obj):
@@ -73,11 +72,17 @@ corpus_df = _load_corpus_as_dataframe(file_path1,file_path2)
 # Sign In route
 @app.route('/', methods=['GET', 'POST'])
 def sign_in():
+    '''This function is called when the user first visits the website, it
+    renders the signin.html template which asks for username, password, country and city'''
     return render_template('signin.html', page_title="Sign In")
 
 # Home URL "/"
 @app.route('/index', methods=['POST'])
 def index():
+    '''This function is called when the user submits the sign in form, it
+    gets the username from the form and stores it in the session object. It
+    then renders the index.html template and passes the username as a parameter'''
+    
     print("starting home url /...")
     # flask server stores the data in the session object
     session['id'] = random.randint(0, 100000)
@@ -90,7 +95,14 @@ def index():
     session['city'] = request.form['city']
     session['query_counter'] = 0
     session['start_time'] = datetime.utcnow()
-    
+
+    # store in listo of objects visitor
+    visitor = Visitor(session['id'], session['username'], session['user_ip'], 
+                      session['country'], session['city'], session['browser'], session['device'])
+    visitors.append(visitor)
+
+    print('visitors until now: ', visitors)
+
     print(session)
 
     return render_template('index.html', page_title="Welcome")
@@ -99,9 +111,16 @@ def index():
 
 @app.route('/search', methods=['POST'])
 def search_form_post():
+    '''This function is called when the user submits the search form, it 
+    gets the search query from the form and calls the search function from
+    the search engine. It then renders the results.html template and passes'''
+
+    # get the search query from the form
     search_query = request.form['search-query']
     search_algorithm = request.form.get('search-algorithm', 'algorithm_1')
 
+    # store the search query in the session object
+    session['query_counter'] += 1
     session['last_search_query'] = search_query
 
     search_id = analytics_data.save_query_terms(search_query)
@@ -109,6 +128,7 @@ def search_form_post():
     print("SEARCH ID: ", search_id)
     print("NUMBER OF QUERY TERMS: ", count_query_terms)
 
+    # show results depending on the selected search algorithm
     if search_algorithm == 'algorithm_1':
         # Call the search function for Algorithm I
         results = search_engine.search(search_query, search_id, corpus, 1, corpus_df)
@@ -122,12 +142,19 @@ def search_form_post():
         # Handle unknown search algorithms
         return render_template('error.html', error_message="Unknown search algorithm")
 
+    # store search information in the session object
     found_count = len(results)
     session['last_found_count'] = found_count
     serializable_results = [result.to_dict() for result in results]
     session['results'] = serializable_results
-   
-    print(session)
+
+    # store data in query dataframe in same tuple with query_id as key
+    query = Query(search_id, search_query, found_count, session['query_counter'])
+    queries.append(query)
+
+    print("queries until now: ", queries)
+ 
+    #print(session)
 
     return render_template('results.html', results_list=results, page_title="Results", search_algorithm=search_algorithm, found_counter=found_count)
 
@@ -136,12 +163,12 @@ def doc_details():
     # getting request parameters:
     # user = request.args.get('user')
 
-    print("doc details session: ")
+    '''print("doc details session: ")
     print(session)
 
     res = session["some_var"]
 
-    print("recovered var from session:", res)
+    print("recovered var from session:", res)'''
 
     # get the query string parameters from request
     clicked_doc_id = request.args["id"]
@@ -149,18 +176,18 @@ def doc_details():
     p2 = int(request.args["param2"])  # transform to Integer
     print("click in id={}".format(clicked_doc_id))
 
-    # store data in statistics table 1
-    if clicked_doc_id in analytics_data.fact_clicks.keys():
-        analytics_data.fact_clicks[clicked_doc_id] += 1
-    else:
-        analytics_data.fact_clicks[clicked_doc_id] = 1
+    analytics_data.save_click(clicked_doc_id)
+    
 
-    print("fact_clicks count for id={} is {}".format(clicked_doc_id, analytics_data.fact_clicks[clicked_doc_id]))
+    print("fact_clicks count for document id={} is {}".format(clicked_doc_id, analytics_data.fact_clicks[clicked_doc_id]))
 
     return render_template('doc_details.html')
 
+
+
 @app.route('/stats', methods=['GET'])
 def stats():
+
     docs = []
 
     for doc_id in analytics_data.fact_clicks:
@@ -179,6 +206,14 @@ def stats():
 
         doc = StatsDocument(row.id, row.title, row.description, row.doc_date, row.url, count, ranking)
         docs.append(doc)
+
+    '''for doc_id in analytics_data.fact_time:
+        row: Document = corpus[int(doc_id)]x
+        time = analytics_data.fact_time[doc_id]
+
+        doc = next((item for item in docs if item.id == doc_id), None)
+        if doc:
+            doc.dwell_time = time'''
 
     docs.sort(key=lambda doc: (doc.count, doc.ranking), reverse=True)
 
