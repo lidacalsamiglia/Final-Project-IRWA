@@ -100,9 +100,14 @@ def index():
     session['start_time'] = datetime.utcnow()
 
     # store in listo of objects visitor
-    visitor = Visitor(session['id'], session['username'], session['user_ip'], 
+    visitor = Visitor(session['id'], session['username'], str(session['user_ip']), 
                       session['country'], session['city'], session['browser'], session['device'])
     visitors.append(visitor)
+
+    # Assuming 'visitors' is a list
+    for visitor in visitors:
+        print(f"ID: {visitor.id}, Username: {visitor.username}, IP: {visitor.ip_address}, Country: {visitor.country}, City: {visitor.city}, Browser: {visitor.browser}, Device: {visitor.device}")
+
 
     print('visitors until now: ', visitors)
 
