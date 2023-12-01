@@ -1,0 +1,91 @@
+{% extends "base.html" %}
+{% block page_title %}{{ page_title }}{% endblock %}
+{% block content %}
+    <div class="centered">
+        <form class="text-center" method="POST" onsubmit='return submitForm();' action="/search">
+            <input class="form-control mb-2" name="search-query" type="search" placeholder="Search" aria-label="Search" autofocus="autofocus">
+            <div class="row">
+                <div class="col">
+                    <div class="input-group">
+                        <select class="form-control" name="search-algorithm" id="search-algorithm">
+                            <option value="algorithm_1">Search Algorithm I</option>
+                            <option value="algorithm_2">Search Algorithm II</option>
+                            <option value="algorithm_3">Search Algorithm III</option>
+                        </select>
+                        <div class="input-group-append">
+                            <button class="btn btn-info" type="button" data-toggle="tooltip" title="" data-target="#infoModal" style="background-color: #5c5b5b; border-color: #8c8c8c;">&#9432;</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <input name="upf-irwa-hidden" type="hidden" value="123">
+            <button class="btn btn-primary mt-2" type="submit" style="background-color: #007BFF;">Search</button>
+        </form>
+    </div>
+
+    <!-- Modal -->
+    <div class="modal fade" id="infoModal" tabindex="-1" role="dialog" aria-labelledby="infoModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="infoModalLabel">Search Algorithm Information</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <!-- Information about the selected search algorithm -->
+                    <p id="algorithm-info"></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        $(document).ready(function () {
+            // Enable Bootstrap tooltip
+            $('[data-toggle="tooltip"]').tooltip();
+    
+            // Update the tooltip title when the user selects a different search algorithm
+            $('#search-algorithm').change(function () {
+                var selectedAlgorithm = $('#search-algorithm option:selected').text();
+                updateTooltipContent(selectedAlgorithm);
+            });
+    
+            // Set initial tooltip content based on the default selected algorithm
+            var initialAlgorithm = $('#search-algorithm option:selected').text();
+            updateTooltipContent(initialAlgorithm);
+        });
+    
+        function updateTooltipContent(algorithm) {
+            // Get the tooltip element
+            var tooltipElement = $('[data-toggle="tooltip"]');
+    
+            // Update the tooltip title based on the selected search algorithm
+            tooltipElement.attr('data-original-title', getAlgorithmInfo(algorithm));
+    
+            // Destroy and reinitialize the tooltip to apply the changes
+            tooltipElement.tooltip('dispose').tooltip();
+        }
+    
+        function getAlgorithmInfo(algorithm) {
+            // Your existing function to provide information about each search algorithm
+            switch (algorithm) {
+                case 'Search Algorithm I':
+                    return 'Search Algorithm I: tdf+cosine similarity';
+                case 'Search Algorithm II':
+                    return 'Search Algorithm II: extension of algorithm I by integrating popularity metrics ';
+                case 'Search Algorithm III':
+                    return 'Search Algorithm III: word2vec + cosine similarity';
+                default:
+                    return '';
+            }
+        }
+    
+        function submitForm() {
+            // Your existing function for form submission
+            return true;
+        }
+    </script>
+    
+{% endblock %}
