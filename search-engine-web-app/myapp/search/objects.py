@@ -33,14 +33,13 @@ class StatsDocument:
     Original corpus data as an object
     """
 
-    def __init__(self, id, title, description, doc_date, url, count, ranking):
+    def __init__(self, id, title, description, doc_date, url, count):
         self.id = id
         self.title = title
         self.description = description
         self.doc_date = doc_date
         self.url = url
         self.count = count
-        self.ranking = ranking
         self.dwell_time = 0
     def __str__(self):
         """
@@ -77,7 +76,7 @@ class ResultItem:
             title=data['title'],
             description=data['description'],
             doc_date=data['doc_date'],
-            url=data.get('url', ''),  # You can use get() to provide a default value if 'url' is not present
+            url=data.get('url', ''),  
             doc_stats=data.get('doc_stats', ''),
             likes=data.get('likes', ''),
             retweets=data.get('retweets', ''),
