@@ -1,6 +1,8 @@
 {% extends "base.html" %}
 {% block page_title %}{{ page_title }}{% endblock %}
 {% block content %}
+    <p>Searched Query: <strong>{{ search_query }}</strong></p>
+    <hr>
     <p>Search Algorithm Used: <strong>{{ search_algorithm }}</strong></p>
     <hr>
     Found <strong>{{ found_counter }}</strong> results...

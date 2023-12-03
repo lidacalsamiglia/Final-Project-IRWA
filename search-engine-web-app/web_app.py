@@ -69,7 +69,7 @@ file_path2 = path + "/Rus_Ukr_war_data_ids.csv"
 # file_path = "../../tweets-data-who.json"
 corpus = load_corpus(file_path1, file_path2)
 corpus_df = _load_corpus_as_dataframe(file_path1,file_path2)
-#print("loaded corpus. first elem: ", corpus.head(1) )
+print("loaded corpus. first elem:", list(corpus.values())[0])
 
 
 # Sign In route
@@ -112,8 +112,6 @@ def index():
     print('visitors until now: ', visitors)
 
     #print(session)
-    
-
     return render_template('index.html', page_title="Welcome")
 
 
@@ -127,6 +125,7 @@ def search_form_post():
     # get the search query from the form
     search_query = request.form['search-query']
     search_algorithm = request.form.get('search-algorithm', 'algorithm_1')
+    print("SEARCH ALGORITHM: ", search_algorithm)
 
     # store the search query in the session object
     if 'query_counter' in session:
@@ -168,20 +167,10 @@ def search_form_post():
  
     #print(session)
 
-    return render_template('results.html', results_list=results, page_title="Results", search_algorithm=search_algorithm, found_counter=found_count)
+    return render_template('results.html', results_list=results, page_title="Results", search_algorithm=search_algorithm,search_query=search_query, found_counter=found_count)
 
 @app.route('/doc_details', methods=['GET', 'POST'])
 def doc_details():
-    # getting request parameters:
-    # user = request.args.get('user')
-
-    '''print("doc details session: ")
-    print(session)
-
-    res = session["some_var"]
-
-    print("recovered var from session:", res)'''
-
     # get the query string parameters from request
     clicked_doc_id = request.args["id"]
     p1 = int(request.args["search_id"])  # transform to Integer
@@ -205,18 +194,8 @@ def stats():
     for doc_id in analytics_data.fact_clicks:
         row: Document = corpus[int(doc_id)]
         count = analytics_data.fact_clicks[doc_id]
+        doc = StatsDocument(row.id, row.title, row.description, row.doc_date, row.url, count)
 
-        serializable_results = session.get('results', [])
-        results = [ResultItem.from_dict(result) for result in serializable_results]
-
-        result_item = next((item for item in results if item.id == doc_id), None)
-
-        if result_item:
-            ranking = result_item.ranking
-        else:
-            ranking = None
-
-        doc = StatsDocument(row.id, row.title, row.description, row.doc_date, row.url, count, ranking)
         docs.append(doc)
 
     
@@ -225,7 +204,7 @@ def stats():
     df['id'] = df['id'].astype(str)
 
     # Create a bar chart using plotly
-    fig = px.bar(df, x='id', y='count', color='ranking', labels={'id': 'Document ID', 'count': 'Visits'}, title='Clicks Stats')
+    fig = px.bar(df, x='id', y='count', labels={'id': 'Document ID', 'count': 'Visits'}, title='Clicks Stats')
 
     # Convert the plot to HTML
     chart_html = fig.to_html(full_html=False)
@@ -238,7 +217,7 @@ def stats():
         if doc:
             doc.dwell_time = time'''
 
-    docs.sort(key=lambda doc: (doc.count, doc.ranking), reverse=True)
+    docs.sort(key=lambda doc: doc.count, reverse=True)
 
     return render_template('stats.html', clicks_data=docs, chart_html=chart_html)
 
@@ -258,8 +237,6 @@ def dashboard():
             'counter': doc.counter,
         })
 
-    # simulate sort by ranking
-    #visited_docs.sort(key=lambda doc: doc.counter, reverse=True)
     visited_docs.sort(key=lambda doc: doc['counter'], reverse=True)
 
 
@@ -268,21 +245,6 @@ def dashboard():
     global visitors
     global queries
     return render_template('dashboard.html', visited_docs=visited_docs, visitors=visitors, queries=queries)
-
-
-@app.route('/sentiment')
-def sentiment_form():
-    return render_template('sentiment.html')
-
-
-@app.route('/sentiment', methods=['POST'])
-def sentiment_form_post():
-    text = request.form['text']
-    nltk.download('vader_lexicon')
-    from nltk.sentiment.vader import SentimentIntensityAnalyzer
-    sid = SentimentIntensityAnalyzer()
-    score = ((sid.polarity_scores(str(text)))['compound'])
-    return render_template('sentiment.html', score=score)
 
 
 if __name__ == "__main__":
